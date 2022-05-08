@@ -16,13 +16,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.jsonwebtoken.impl.DefaultClaims;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,6 +42,7 @@ public class AuthenticationController {
     public ResponseEntity<?> loginUser(@RequestParam("username") String username,
                                        @RequestParam("password") String password) {
         Map<String, Object> responseMap = new HashMap<>();
+
         try {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username
                     , password));
@@ -75,21 +76,52 @@ public class AuthenticationController {
         }
     }
 
+
     @PostMapping("/register")
     public ResponseEntity<?> saveUser(@RequestParam("username") String username
             , @RequestParam("password") String password) {
         Map<String, Object> responseMap = new HashMap<>();
-        User user = new User();
-        user.setPassword(new BCryptPasswordEncoder().encode(password));
-        user.setRole("USER");
-        user.setUsername(username);
-        UserDetails userDetails = userDetailsService.createUserDetails(username, user.getPassword());
-        String token = jwtTokenUtil.generateToken(userDetails);
-        userRepository.save(user);
+        if (userRepository.findUserByUsername(username) == null) {
+            User user = new User();
+            user.setPassword(new BCryptPasswordEncoder().encode(password));
+            user.setRole("USER");
+            user.setUsername(username);
+            UserDetails userDetails = userDetailsService.createUserDetails(username, user.getPassword());
+            String token = jwtTokenUtil.generateToken(userDetails);
+            userRepository.save(user);
+            responseMap.put("error", false);
+            responseMap.put("username", username);
+            responseMap.put("message", "Account created successfully");
+            responseMap.put("token", token);
+            return ResponseEntity.ok(responseMap);
+        } else {
+            responseMap.put("error", true);
+            responseMap.put("message", "user exists!");
+            return ResponseEntity.status(500).body(responseMap);
+        }
+
+    }
+
+    @RequestMapping(value = "/refreshtoken", method = RequestMethod.GET)
+    public ResponseEntity<?> refreshtoken(HttpServletRequest request) throws Exception {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        // From the HttpRequest get the claims
+        DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
+
+        Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
+        String token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
         responseMap.put("error", false);
-        responseMap.put("username", username);
-        responseMap.put("message", "Account created successfully");
+        responseMap.put("message", "Token refresh");
         responseMap.put("token", token);
         return ResponseEntity.ok(responseMap);
+    }
+
+    public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
+        Map<String, Object> expectedMap = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> entry : claims.entrySet()) {
+            expectedMap.put(entry.getKey(), entry.getValue());
+        }
+        return expectedMap;
     }
 }
