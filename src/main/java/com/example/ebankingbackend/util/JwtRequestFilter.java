@@ -2,6 +2,8 @@ package com.example.ebankingbackend.util;
 
 import com.example.ebankingbackend.service.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.SignatureException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -47,21 +50,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (IllegalArgumentException e) {
                 logger.error("Unable to fetch JWT Token");
             } catch (ExpiredJwtException e) {
-                String isRefreshToken = request.getHeader("isRefreshToken");
-                String requestURL = request.getRequestURL().toString();
-                // allow for Refresh Token creation if following conditions are true.
-                if (isRefreshToken != null && isRefreshToken.equals("true") && requestURL.contains("refreshtoken")) {
-                    allowForRefreshToken(e, request);
-                } else {
-                    request.setAttribute("exception", e);
-                }
-//                logger.error("JWT Token is expired");
+                logger.error("JWT Token is expired");
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
         }
+//        else {
+//            logger.warn("JWT Token does not begin with Bearer String");
+//        }
         chain.doFilter(request, response);
 
     }

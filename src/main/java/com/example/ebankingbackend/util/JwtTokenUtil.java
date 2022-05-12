@@ -34,7 +34,9 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+//        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();  //to fix JWT signature does not match locally computed signature
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.replace("{", "").replace("}","")).getBody();
+
     }
 
     private Boolean isTokenExpired(String token) {
@@ -45,14 +47,6 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000)).signWith(key).compact();
-    }
-
-    public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, key).compact();
-
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
