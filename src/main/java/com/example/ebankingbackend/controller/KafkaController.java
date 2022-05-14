@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("kafka")
+@RequestMapping("api/kafka")
 public class KafkaController {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaController.class);
 

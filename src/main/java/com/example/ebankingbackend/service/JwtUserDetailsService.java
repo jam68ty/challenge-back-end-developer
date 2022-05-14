@@ -22,7 +22,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        com.example.ebankingbackend.model.User user = userRepository.findUserByUsername(username);
+        com.example.ebankingbackend.model.User user = userRepository.findUserByUsername(username).get();
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
 

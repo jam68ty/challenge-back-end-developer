@@ -41,13 +41,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable().authorizeRequests().antMatchers("/auth/*")
+        httpSecurity.csrf().disable().authorizeRequests().antMatchers("/api/auth/*")
                 .permitAll().anyRequest().authenticated().and().exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) -> {
                     Map<String, Object> responseMap = new HashMap<>();
                     ObjectMapper mapper = new ObjectMapper();
                     response.setStatus(401);
-                    responseMap.put("error", true);
+                    responseMap.put("code", "error");
                     responseMap.put("message", "Unauthorized");
                     response.setHeader("content-type", "application/json");
                     String responseMsg = mapper.writeValueAsString(responseMap);

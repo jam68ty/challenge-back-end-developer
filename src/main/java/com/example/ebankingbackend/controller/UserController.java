@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     @GetMapping
@@ -18,7 +18,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", authentication.getName());
-        userMap.put("error", false);
+        userMap.put("code", "success");
         return userMap;
     }
 }

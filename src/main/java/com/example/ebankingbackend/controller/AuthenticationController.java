@@ -4,7 +4,6 @@ import com.example.ebankingbackend.model.User;
 import com.example.ebankingbackend.repository.UserRepository;
 import com.example.ebankingbackend.service.JwtUserDetailsService;
 import com.example.ebankingbackend.util.JwtTokenUtil;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +15,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.jsonwebtoken.impl.DefaultClaims;
-
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthenticationController {
-    protected final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -82,7 +81,7 @@ public class AuthenticationController {
                                       @RequestParam("password") String password,
                                       @RequestParam("email") String email) {
         Map<String, Object> responseMap = new HashMap<>();
-        if (userRepository.findUserByUsername(username) == null) {
+        if (userRepository.findUserByUsername(username).isEmpty()) {
             User user = new User();
             user.setUserId("");
             user.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -103,27 +102,4 @@ public class AuthenticationController {
         }
 
     }
-
-//    @RequestMapping(value = "/refreshtoken", method = RequestMethod.GET)
-//    public ResponseEntity<?> refreshtoken(HttpServletRequest request) throws Exception {
-//        Map<String, Object> responseMap = new HashMap<>();
-//
-//        // From the HttpRequest get the claims
-//        DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
-//
-//        Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
-//        String token = jwtTokenUtil.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
-//        responseMap.put("code", "success");
-//        responseMap.put("message", "Token refresh");
-//        responseMap.put("token", token);
-//        return ResponseEntity.ok(responseMap);
-//    }
-//
-//    public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
-//        Map<String, Object> expectedMap = new HashMap<String, Object>();
-//        for (Map.Entry<String, Object> entry : claims.entrySet()) {
-//            expectedMap.put(entry.getKey(), entry.getValue());
-//        }
-//        return expectedMap;
-//    }
 }
