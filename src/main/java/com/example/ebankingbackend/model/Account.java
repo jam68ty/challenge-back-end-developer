@@ -26,15 +26,14 @@ public class Account implements Serializable {
     private String ibanCode;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="user_id", nullable=false, referencedColumnName = "user_id", updatable = false)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "user_id", updatable = false)
     private User userId;
 
-    @OneToMany(mappedBy = "ibanCode", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @OneToMany(mappedBy = "ibanCode", cascade = CascadeType.MERGE, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<MultiCurrencyAccount> multiCurrencyAccountSet = new HashSet<>();
 
 
-    public void addMultiCurrencyAccount(MultiCurrencyAccount account){
+    public void addMultiCurrencyAccount(MultiCurrencyAccount account) {
         this.multiCurrencyAccountSet.add(account);
     }
 }

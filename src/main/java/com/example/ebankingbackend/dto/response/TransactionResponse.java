@@ -1,13 +1,9 @@
-package com.example.ebankingbackend.dto;
+package com.example.ebankingbackend.dto.response;
 
+import com.example.ebankingbackend.dto.response.MultiCurrencyAccountResponse;
 import com.example.ebankingbackend.model.Account;
-import com.example.ebankingbackend.model.MultiCurrencyAccount;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.example.ebankingbackend.dto;
+package com.example.ebankingbackend.dto.response;
 
 import com.example.ebankingbackend.model.MultiCurrencyAccount;
 import com.example.ebankingbackend.model.User;

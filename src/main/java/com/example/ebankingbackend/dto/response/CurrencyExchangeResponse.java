@@ -1,4 +1,4 @@
-package com.example.ebankingbackend.dto;
+package com.example.ebankingbackend.dto.response;
 
 import lombok.Data;
 
@@ -8,5 +8,5 @@ public class CurrencyExchangeResponse {
     private boolean success;
     private String date;
     private double result;
-    private ExchangeInfo info;
+    private ExchangeInfoResponse info;
 }

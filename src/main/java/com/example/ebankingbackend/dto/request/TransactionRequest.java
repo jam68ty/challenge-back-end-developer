@@ -1,4 +1,4 @@
-package com.example.ebankingbackend.dto;
+package com.example.ebankingbackend.dto.request;
 
 import lombok.Data;
 
