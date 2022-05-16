@@ -8,7 +8,8 @@ import java.util.Set;
 
 @Data
 public class AccountResponse {
+
     private String ibanCode;
     private User userId;
-    private Set<MultiCurrencyAccountResponse> multiCurrencyAccountSet;
+    private Set<MultiCurrencyAccount> multiCurrencyAccountSet;
 }

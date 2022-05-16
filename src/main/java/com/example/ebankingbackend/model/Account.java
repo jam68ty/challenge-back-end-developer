@@ -1,9 +1,11 @@
 package com.example.ebankingbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Proxy(lazy = false)
 public class Account implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -26,14 +29,10 @@ public class Account implements Serializable {
     @JoinColumn(name="user_id", nullable=false, referencedColumnName = "user_id", updatable = false)
     private User userId;
 
-    @OneToMany(mappedBy = "accountIbanCode", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "ibanCode", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<MultiCurrencyAccount> multiCurrencyAccountSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "accountIbanCode", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Collection<TransactionRecord> transactionRecords;
 
     public void addMultiCurrencyAccount(MultiCurrencyAccount account){
         this.multiCurrencyAccountSet.add(account);

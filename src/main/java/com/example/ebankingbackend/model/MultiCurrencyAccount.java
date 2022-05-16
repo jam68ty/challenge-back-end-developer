@@ -28,8 +28,8 @@ public class MultiCurrencyAccount implements Serializable {
     private String currency;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name="account_iban_code", nullable=false, updatable = false)
-    private Account accountIbanCode;
+    @JoinColumn(name="iban_code", nullable=false, updatable = false)
+    private Account ibanCode;
 
     @Column(name = "type", nullable = false)
     private String type;

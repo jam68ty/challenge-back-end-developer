@@ -1,5 +1,6 @@
 package com.example.ebankingbackend.controller;
 
+import com.example.ebankingbackend.model.TransactionRecord;
 import com.example.ebankingbackend.model.User;
 import com.example.ebankingbackend.repository.UserRepository;
 import org.slf4j.Logger;
@@ -17,7 +18,7 @@ public class KafkaController {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaController.class);
 
     @Autowired
-    private KafkaTemplate<String, User> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private UserRepository userRepository;

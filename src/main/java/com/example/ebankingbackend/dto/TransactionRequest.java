@@ -4,8 +4,11 @@ import lombok.Data;
 
 @Data
 public class TransactionRequest {
-    private String currency;
+
+    private String multiCurrencyAccountId;
+    private String transactionCurrency;
     private double amount;
-    private String accountIBAN;
     private String description;
+    private String type;
+
 }

@@ -1,6 +1,7 @@
 package com.example.ebankingbackend.controller;
 
 import com.example.ebankingbackend.dto.AccountResponse;
+import com.example.ebankingbackend.dto.MultiCurrencyAccountResponse;
 import com.example.ebankingbackend.model.Account;
 import com.example.ebankingbackend.model.MultiCurrencyAccount;
 import com.example.ebankingbackend.model.User;
@@ -19,10 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.money.Monetary;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/account")
@@ -69,7 +67,7 @@ public class AccountController {
             MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
             multiCurrencyAccount.setMultiCurrencyAccountId("");
             multiCurrencyAccount.setCurrency(Monetary.getCurrency(currency).getCurrencyCode());
-            multiCurrencyAccount.setAccountIbanCode(savedAccount);
+            multiCurrencyAccount.setIbanCode(savedAccount);
             multiCurrencyAccount.setBalance(balance);
             multiCurrencyAccount.setType(type);
             multiCurrencyAccountRepository.save(multiCurrencyAccount);
@@ -104,9 +102,13 @@ public class AccountController {
                     }
                 });
         MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
-        if (!multiCurrencyAccountRepository.existsByCurrency(currency) && !multiCurrencyAccountRepository.existsByType(type)) {
+        if (multiCurrencyAccountRepository.existsByType(type) && multiCurrencyAccountRepository.existsByCurrency(currency)) {
+            logger.info("currency exists!");
+            responseMap.put("code", "fail");
+            responseMap.put("message", "currency and account type exists in " + ibanCode);
+        } else {
             multiCurrencyAccount.setMultiCurrencyAccountId("");
-            multiCurrencyAccount.setAccountIbanCode(account);
+            multiCurrencyAccount.setIbanCode(account);
             multiCurrencyAccount.setCurrency(Monetary.getCurrency(currency).getCurrencyCode());
             multiCurrencyAccount.setType(type);
             multiCurrencyAccount.setBalance(balance);
@@ -114,10 +116,6 @@ public class AccountController {
             responseMap.put("code", "success");
             responseMap.put("message", "add a new multiCurrencyAccount to account " + ibanCode);
             responseMap.put("multiCurrencyAccount", multiCurrencyAccount);
-        } else {
-            logger.info("currency exists!");
-            responseMap.put("code", "fail");
-            responseMap.put("message", "currency exists in " + ibanCode);
         }
         return ResponseEntity.ok().body(responseMap);
     }
