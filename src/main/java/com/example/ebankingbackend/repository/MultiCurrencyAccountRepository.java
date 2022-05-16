@@ -15,6 +15,10 @@ public interface MultiCurrencyAccountRepository extends JpaRepository<MultiCurre
     boolean existsByCurrency(String currency);
     boolean existsByType(String type);
 
+    @Query(value = "SELECT COUNT(m) FROM MultiCurrencyAccount m WHERE m.ibanCode = :ibanCode " +
+            "AND m.type = :type AND m.currency = :currency")
+    Integer countBySameIbanCodeAndTypeAndCurrency(Account ibanCode, String type, String currency);
+
     @Query(value = "SELECT m FROM MultiCurrencyAccount m WHERE m.ibanCode = :ibanCode")
     List<MultiCurrencyAccount> findMultiCurrencyAccountByIbanCode(Account ibanCode);
 

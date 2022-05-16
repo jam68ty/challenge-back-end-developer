@@ -29,6 +29,7 @@ public class MultiCurrencyAccount implements Serializable {
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="iban_code", nullable=false, updatable = false)
+    @JsonIgnore
     private Account ibanCode;
 
     @Column(name = "type", nullable = false)

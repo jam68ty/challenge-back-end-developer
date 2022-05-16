@@ -1,6 +1,5 @@
 package com.example.ebankingbackend.service;
 
-import com.example.ebankingbackend.controller.TransactionController;
 import com.example.ebankingbackend.dto.request.TransactionRequest;
 import com.example.ebankingbackend.dto.response.CurrencyExchangeResponse;
 import com.example.ebankingbackend.dto.response.MultiCurrencyAccountResponse;
@@ -27,10 +26,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;

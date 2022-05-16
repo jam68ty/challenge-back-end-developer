@@ -106,7 +106,7 @@ public class AccountService {
                     }
                 });
         MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
-        if (multiCurrencyAccountRepository.existsByType(type) && multiCurrencyAccountRepository.existsByCurrency(currency)) {
+        if (multiCurrencyAccountRepository.countBySameIbanCodeAndTypeAndCurrency(account, type, currency) > 0) {
             logger.info("currency exists!");
             responseMap.put("code", "fail");
             responseMap.put("message", "currency and account type exists in " + ibanCode);
