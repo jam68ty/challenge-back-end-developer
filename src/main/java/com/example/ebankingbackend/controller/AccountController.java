@@ -1,6 +1,7 @@
 package com.example.ebankingbackend.controller;
 
 import com.example.ebankingbackend.dto.response.AccountResponse;
+import com.example.ebankingbackend.model.User;
 import com.example.ebankingbackend.service.AccountService;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;

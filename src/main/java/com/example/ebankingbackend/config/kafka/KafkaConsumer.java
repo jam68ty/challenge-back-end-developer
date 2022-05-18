@@ -1,4 +1,4 @@
-package com.example.ebankingbackend.config;
+package com.example.ebankingbackend.config.kafka;
 
 import com.example.ebankingbackend.model.TransactionRecord;
 import org.slf4j.Logger;

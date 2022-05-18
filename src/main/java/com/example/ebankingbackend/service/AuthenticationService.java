@@ -1,6 +1,5 @@
 package com.example.ebankingbackend.service;
 
-import com.example.ebankingbackend.controller.AuthenticationController;
 import com.example.ebankingbackend.model.User;
 import com.example.ebankingbackend.repository.UserRepository;
 import com.example.ebankingbackend.util.JwtTokenUtil;
@@ -17,8 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.Map;

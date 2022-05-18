@@ -1,4 +1,4 @@
-package com.example.ebankingbackend.config;
+package com.example.ebankingbackend.config.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

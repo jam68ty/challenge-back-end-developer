@@ -92,19 +92,11 @@ public class AccountService {
                 .countryCode(CountryCode.CH)
                 .bankCode(bankCode)
                 .buildRandom();
-
     }
 
     public ResponseEntity<?> createMultiCurrencyAccount(String ibanCode, String currency, double balance, String type) {
         Map<String, Object> responseMap = new HashMap<>();
-        var account =
-                accountRepository.findAccountByIbanCode(ibanCode).orElseThrow(() -> {
-                    try {
-                        throw new Exception("Can't find account");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        var account = findAccountByIbanCode(ibanCode);
         MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
         if (multiCurrencyAccountRepository.countBySameIbanCodeAndTypeAndCurrency(account, type, currency) > 0) {
             logger.info("currency exists!");
@@ -127,14 +119,7 @@ public class AccountService {
 
     public ResponseEntity<?> getAccountByIbanCode(String ibanCode) {
         Map<String, Object> responseMap = new HashMap<>();
-        var account =
-                accountRepository.findAccountByIbanCode(ibanCode).orElseThrow(() -> {
-                    try {
-                        throw new Exception("Can't find account");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        var account = findAccountByIbanCode(ibanCode);
         AccountResponse accountResponse = new AccountResponse();
         objectMapperUtil.objectCovert(account, accountResponse);
         responseMap.put("code", "success");
@@ -145,14 +130,7 @@ public class AccountService {
 
     public ResponseEntity<?> getAccountByUser() {
         Map<String, Object> responseMap = new HashMap<>();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = userRepository.findUserByUsername(authentication.getName()).orElseThrow(() -> {
-            try {
-                throw new Exception("Can't find user");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        var userId = getCurrentUser();
         var accounts = accountRepository.findAccountByUserId(userId);
         List<AccountResponse> accountResponses = new ArrayList<>();
         for (var account : accounts) {
@@ -167,4 +145,24 @@ public class AccountService {
         return ResponseEntity.ok().body(responseMap);
     }
 
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findUserByUsername(authentication.getName()).orElseThrow(() -> {
+            try {
+                throw new Exception("Can't find user");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Account findAccountByIbanCode(String ibanCode) {
+        return accountRepository.findAccountByIbanCode(ibanCode).orElseThrow(() -> {
+            try {
+                throw new Exception("Can't find account");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 }
