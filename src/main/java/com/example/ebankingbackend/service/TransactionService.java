@@ -82,10 +82,6 @@ public class TransactionService {
 
             TransactionResponse response = new TransactionResponse();
             objectMapperUtil.objectCovert(transactionRecord, response);
-
-            //sava transaction
-            kafkaTemplate.send("tx", transactionRecord.getTransactionId().toString(), transactionRecord);
-
             //credit or debit
             if (StringUtils.equals("debit", request.getType())) {
                 transactionRecord.setDescription("success");
@@ -130,10 +126,12 @@ public class TransactionService {
                 return ResponseEntity.badRequest().body(responseMap);
             }
             transactionRepository.save(transactionRecord);
+            kafkaTemplate.send("tx", transactionRecord.getTransactionId().toString(), transactionRecord);
             MultiCurrencyAccountResponse multiCurrencyAccountResponse = new MultiCurrencyAccountResponse();
             objectMapperUtil.objectCovert(subAccount, multiCurrencyAccountResponse);
             multiCurrencyAccountResponse.setMultiCurrencyAccountId(subAccount.getMultiCurrencyAccountId());
             response.setMultiCurrencyAccountId(multiCurrencyAccountResponse);
+            response.setDescription(transactionRecord.getDescription());
             multiCurrencyAccountRepository.save(subAccount);
             kafkaTemplate.send("account", transactionRecord.getTransactionId().toString(), subAccount);
 
@@ -164,6 +162,9 @@ public class TransactionService {
         for (var latestRes : trans.getContent()) {
             TransactionResponse response = new TransactionResponse();
             objectMapperUtil.objectCovert(latestRes, response);
+            MultiCurrencyAccountResponse multiCurrencyAccountResponse = new MultiCurrencyAccountResponse();
+            objectMapperUtil.objectCovert(latestRes.getMultiCurrencyAccountId(), multiCurrencyAccountResponse);
+            response.setMultiCurrencyAccountId(multiCurrencyAccountResponse);
             returnLatestTransaction.add(response);
         }
         responseMap.put("code", "success");

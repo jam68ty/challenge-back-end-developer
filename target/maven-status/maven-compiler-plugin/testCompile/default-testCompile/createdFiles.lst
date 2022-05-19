@@ -1,0 +1,4 @@
+com\example\ebankingbackend\EbankingBackendApplicationTests.class
+com\example\ebankingbackend\service\AccountServiceTest.class
+com\example\ebankingbackend\service\AuthenticationServiceTest.class
+com\example\ebankingbackend\service\TransactionServiceTest.class

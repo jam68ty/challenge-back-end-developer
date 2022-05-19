@@ -166,6 +166,13 @@
             <version>2.9.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.embeddedkafka</groupId>
+            <artifactId>embedded-kafka_2.13</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
