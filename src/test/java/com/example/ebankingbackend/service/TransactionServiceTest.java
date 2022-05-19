@@ -1,8 +1,6 @@
 package com.example.ebankingbackend.service;
 
 import com.example.ebankingbackend.dto.request.TransactionRequest;
-import com.example.ebankingbackend.model.Account;
-import com.example.ebankingbackend.model.TransactionRecord;
 import com.example.ebankingbackend.repository.TransactionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,19 +11,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.UUID;
 
-
-@SpringBootTest(properties = "spring.profiles.active=test")
+@SpringBootTest
 class TransactionServiceTest {
 
     @Autowired

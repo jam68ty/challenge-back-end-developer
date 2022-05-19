@@ -4,6 +4,7 @@ import com.example.ebankingbackend.model.TransactionRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,8 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaProducerConfig {
-    public static final String DEFAULT_SERVER = "127.0.0.1:9092";
+    @Value("${spring.kafka.bootstrap-servers}")
+    public String DEFAULT_SERVER;
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {

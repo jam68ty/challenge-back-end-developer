@@ -2,6 +2,7 @@ package com.example.ebankingbackend.config.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -17,7 +18,8 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConsumerConfig {
 
-    public static final String DEFAULT_SERVER = "127.0.0.1:9092";
+    @Value("${spring.kafka.bootstrap-servers}")
+    public String DEFAULT_SERVER;
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {

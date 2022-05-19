@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 
-@SpringBootTest(properties = "spring.profiles.active=test")
+@SpringBootTest
 class AccountServiceTest {
 
     @Autowired
