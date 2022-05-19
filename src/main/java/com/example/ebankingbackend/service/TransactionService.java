@@ -78,7 +78,6 @@ public class TransactionService {
             transactionRecord.setIbanCode(subAccount.getIbanCode());
             transactionRecord.setCurrency(request.getTransactionCurrency());
             transactionRecord.setValueDate(LocalDateTime.now());
-            transactionRecord.setDescription(request.getDescription());
             transactionRecord.setType(request.getType());
 
             TransactionResponse response = new TransactionResponse();

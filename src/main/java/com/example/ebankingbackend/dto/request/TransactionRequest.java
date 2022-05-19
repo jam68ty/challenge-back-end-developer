@@ -17,9 +17,6 @@ public class TransactionRequest {
     @ApiModelProperty(value = "amount", required = true, position = 2)
     private double amount;
 
-    @ApiModelProperty(value = "description", required = false, position = 3)
-    private String description;
-
     @ApiModelProperty(value = "type", required = true, position = 4)
     private String type;
 
