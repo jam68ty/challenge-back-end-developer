@@ -25,7 +25,7 @@ public class TransactionRecord implements Serializable, Deserializer {
 
     @Id
     @Column(name = "transaction_id", nullable = false, columnDefinition = "BINARY(16)")
-    @GeneratedValue(generator = "UUID")
+    @GeneratedValue(generator = "UUID", strategy = GenerationType.AUTO)
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"

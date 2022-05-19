@@ -83,12 +83,14 @@ public class AuthenticationService {
             userRepository.save(user);
             responseMap.put("code", "success");
             responseMap.put("username", username);
-            responseMap.put("message", "Account created successfully");
+            responseMap.put("message", "User created successfully");
             responseMap.put("token", token);
+            logger.info("[AuthenticationService] - User created successfully");
             return ResponseEntity.ok(responseMap);
         } else {
             responseMap.put("code", "error");
             responseMap.put("message", "user exists!");
+            logger.error("[AuthenticationService] - User exists");
             return ResponseEntity.status(500).body(responseMap);
         }
 

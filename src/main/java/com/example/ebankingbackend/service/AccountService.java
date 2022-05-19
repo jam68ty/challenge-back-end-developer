@@ -8,6 +8,7 @@ import com.example.ebankingbackend.repository.AccountRepository;
 import com.example.ebankingbackend.repository.MultiCurrencyAccountRepository;
 import com.example.ebankingbackend.repository.UserRepository;
 import com.example.ebankingbackend.util.ObjectMapperUtil;
+import org.apache.commons.lang3.ObjectUtils;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 import org.slf4j.Logger;
@@ -55,14 +56,7 @@ public class AccountService {
 
             accountRepository.save(account);
 
-            var savedAccount =
-                    accountRepository.findAccountByIbanCode(randomIbanCode).orElseThrow(() -> {
-                        try {
-                            throw new Exception("Can't find account");
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+            var savedAccount = findAccountByIbanCode(randomIbanCode);
 
             MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
             multiCurrencyAccount.setMultiCurrencyAccountId("");
@@ -77,10 +71,11 @@ public class AccountService {
 
             AccountResponse response = new AccountResponse();
             objectMapperUtil.objectCovert(savedAccount, response);
-
+            logger.info("[AccountService] - Add a new account successfully");
             responseMap.put("code", "success");
             responseMap.put("account", response);
         } else {
+            logger.error("[AccountService] - Random iban code is duplicated, retry again");
             responseMap.put("code", "fail");
             responseMap.put("message", "random iban code is duplicated, retry again");
         }
@@ -97,33 +92,49 @@ public class AccountService {
     public ResponseEntity<?> createMultiCurrencyAccount(String ibanCode, String currency, double balance, String type) {
         Map<String, Object> responseMap = new HashMap<>();
         var account = findAccountByIbanCode(ibanCode);
-        MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
-        if (multiCurrencyAccountRepository.countBySameIbanCodeAndTypeAndCurrency(account, type, currency) > 0) {
-            logger.info("currency exists!");
-            responseMap.put("code", "fail");
-            responseMap.put("message", "currency and account type exists in " + ibanCode);
+        if (ObjectUtils.isNotEmpty(account) && getCurrentUser().equals(account.getUserId())) {
+            MultiCurrencyAccount multiCurrencyAccount = new MultiCurrencyAccount();
+            if (multiCurrencyAccountRepository.countBySameIbanCodeAndTypeAndCurrency(account, type, currency) > 0) {
+                logger.error("[AccountService] - Currency exists!");
+                responseMap.put("code", "fail");
+                responseMap.put("message", "currency and account type exists in " + ibanCode);
+            } else {
+                multiCurrencyAccount.setMultiCurrencyAccountId("");
+                multiCurrencyAccount.setIbanCode(account);
+                multiCurrencyAccount.setCurrency(Monetary.getCurrency(currency).getCurrencyCode());
+                multiCurrencyAccount.setType(type);
+                multiCurrencyAccount.setBalance(balance);
+                multiCurrencyAccountRepository.save(multiCurrencyAccount);
+                logger.info("[AccountService] - Add a new multiCurrencyAccount successfully");
+                responseMap.put("code", "success");
+                responseMap.put("message", "add a new multi currency account to account " + ibanCode);
+                responseMap.put("multiCurrencyAccount", multiCurrencyAccount);
+            }
         } else {
-            multiCurrencyAccount.setMultiCurrencyAccountId("");
-            multiCurrencyAccount.setIbanCode(account);
-            multiCurrencyAccount.setCurrency(Monetary.getCurrency(currency).getCurrencyCode());
-            multiCurrencyAccount.setType(type);
-            multiCurrencyAccount.setBalance(balance);
-            multiCurrencyAccountRepository.save(multiCurrencyAccount);
-            responseMap.put("code", "success");
-            responseMap.put("message", "add a new multiCurrencyAccount to account " + ibanCode);
-            responseMap.put("multiCurrencyAccount", multiCurrencyAccount);
+            logger.error("[AccountService] - This account is not belong to this user");
+            responseMap.put("code", "fail");
+            responseMap.put("message", "iban code is not exists");
         }
+
         return ResponseEntity.ok().body(responseMap);
     }
 
 
     public ResponseEntity<?> getAccountByIbanCode(String ibanCode) {
         Map<String, Object> responseMap = new HashMap<>();
+
         var account = findAccountByIbanCode(ibanCode);
-        AccountResponse accountResponse = new AccountResponse();
-        objectMapperUtil.objectCovert(account, accountResponse);
-        responseMap.put("code", "success");
-        responseMap.put("account", accountResponse);
+        if (ObjectUtils.isNotEmpty(account) && account.getUserId().equals(getCurrentUser())) {
+            AccountResponse accountResponse = new AccountResponse();
+            objectMapperUtil.objectCovert(account, accountResponse);
+            logger.info("[AccountService] - Get account " + account);
+            responseMap.put("code", "success");
+            responseMap.put("account", accountResponse);
+        } else {
+            logger.info("[AccountService] - This account is not exists");
+            responseMap.put("code", "fail");
+            responseMap.put("message", "this account is not exists");
+        }
 
         return ResponseEntity.ok().body(responseMap);
     }
@@ -138,11 +149,21 @@ public class AccountService {
             objectMapperUtil.objectCovert(account, re);
             accountResponses.add(re);
         }
-
+        logger.info("[AccountService] - Get accounts by user");
         responseMap.put("code", "success");
         responseMap.put("account", accountResponses);
 
         return ResponseEntity.ok().body(responseMap);
+    }
+
+    public Account findAccountByIbanCode(String ibanCode) {
+        return accountRepository.findAccountByIbanCode(ibanCode).orElseThrow(() -> {
+            try {
+                throw new Exception("Can't find account");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public User getCurrentUser() {
@@ -150,16 +171,6 @@ public class AccountService {
         return userRepository.findUserByUsername(authentication.getName()).orElseThrow(() -> {
             try {
                 throw new Exception("Can't find user");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public Account findAccountByIbanCode(String ibanCode) {
-        return accountRepository.findAccountByIbanCode(ibanCode).orElseThrow(() -> {
-            try {
-                throw new Exception("Can't find account");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

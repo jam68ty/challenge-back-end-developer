@@ -1,6 +1,9 @@
 package com.example.ebankingbackend.service;
 
 import com.example.ebankingbackend.dto.request.TransactionRequest;
+import com.example.ebankingbackend.model.TransactionRecord;
+import com.example.ebankingbackend.repository.AccountRepository;
+import com.example.ebankingbackend.repository.MultiCurrencyAccountRepository;
 import com.example.ebankingbackend.repository.TransactionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,6 +34,12 @@ class TransactionServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private MultiCurrencyAccountRepository multiCurrencyAccountRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     @BeforeEach
     void setup() throws JSONException {
         String username = "user1";
@@ -42,17 +52,18 @@ class TransactionServiceTest {
     @Test
     @WithMockUser(username = "user1")
     void createTransactionRecord() throws JSONException, JsonProcessingException {
+        String ibanCode = createParentAccount();
+        var multiCurrencyAccountSet = accountRepository.findAccountByIbanCode(ibanCode).get().getMultiCurrencyAccountSet();
 
-        String multiCurrencyAccountId = "MCA000000000001";
         double amount = 10;
         String type = "debit";
-        String transactionCurrency = "USD";
+        String currency = "USD";
+        String multiCurrencyAccountId = multiCurrencyAccountSet.iterator().next().getMultiCurrencyAccountId();
         TransactionRequest request = new TransactionRequest();
         request.setMultiCurrencyAccountId(multiCurrencyAccountId);
-        request.setAmount(amount);
         request.setType(type);
-        request.setTransactionCurrency(transactionCurrency);
-        request.setDescription("test");
+        request.setAmount(amount);
+        request.setTransactionCurrency(currency);
 
         var response = transactionService.createTransactionRecord(request);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -64,7 +75,7 @@ class TransactionServiceTest {
 
         Assertions.assertThat(Double.parseDouble(record.get("amount").toString())).isEqualTo(amount);
         Assertions.assertThat(record.get("transactionId").toString()).isNotEmpty();
-        Assertions.assertThat(record.get("currency").toString()).isEqualTo(transactionCurrency);
+        Assertions.assertThat(record.get("currency").toString()).isEqualTo(currency);
         Assertions.assertThat(record.get("type").toString()).isEqualTo(type);
         Assertions.assertThat(account.get("multiCurrencyAccountId").toString()).isEqualTo(multiCurrencyAccountId);
     }
@@ -72,7 +83,7 @@ class TransactionServiceTest {
     @Test
     @WithMockUser(username = "user1")
     void getTransactions() throws JSONException, JsonProcessingException {
-        var response = transactionService.getTransactions(5, 0 ,10);
+        var response = transactionService.getTransactions(5, 0, 10);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         String jsonString = objectMapper.writeValueAsString(response.getBody());

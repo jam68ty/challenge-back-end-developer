@@ -53,6 +53,7 @@ class AccountServiceTest {
     @WithMockUser(username = "user")
     void createMultiCurrencyAccount_shouldSuccess() throws JSONException, JsonProcessingException {
         String ibanCode = createParentAccount();
+
         String currency = "USD";
         double balance = 0;
         String type = "checking";
